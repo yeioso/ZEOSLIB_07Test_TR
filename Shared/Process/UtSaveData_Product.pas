@@ -45,6 +45,7 @@ Var
   lCampo : TStringList;
 begin
   Try
+    lJ := 0;
     FCNX := pCNX;
     lLista := TStringList.Create;
     lCampo := TStringList.Create;
@@ -52,14 +53,13 @@ begin
     lLista.Text := pData;
     For lLinea In lLista Do
     Begin
+      Inc(lJ);
+      UtLog_Execute('TSaveData_Product.Create, ' + FormatFloat('###,###,###', lJ) + ' / ' + FormatFloat('###,###,###', lLista.Count));
       lI := TItem_Product.Create;
       FItems.Add(lI);
       Desglosar_Texto_Caracter(lLinea, #39, lCampo);
       If lCampo.Count > 0 Then
         lI.id := Depurar_Texto(lCampo[0]);
-
-      If lI.id = '75de8a1f' Then
-        lI.id := lI.id;
       If lCampo.Count > 1 Then
         lI.name := Depurar_Texto(lCampo[1]);
       If lCampo.Count > 2 Then
@@ -114,11 +114,17 @@ End;
 
 Procedure TSaveData_Product.Save;
 Var
+  lK : Integer;
   lI : TItem_Product;
 Begin
   Try
+    lK := 0;
     For lI In FItems Do
+    Begin
+      Inc(lK);
+      UtLog_Execute('TSaveData_Product.Save, ' + FormatFloat('###,###,##0', lK) + '/' + FormatFloat('###,###,##0', FItems.Count));
       Insert(lI);
+    End;
   Except
     On E: Exception Do
     Begin

@@ -85,8 +85,8 @@ object FrIWBuyer: TFrIWBuyer
       HasTabOrder = False
       FriendlyName = 'lbInfo'
       Caption = 'lbInfo'
-      ExplicitLeft = 2
-      ExplicitTop = 4
+      ExplicitLeft = 3
+      ExplicitTop = 3
     end
   end
   object IWRegion1: TIWRegion
@@ -112,7 +112,7 @@ object FrIWBuyer: TFrIWBuyer
       InactiveTabFont.Style = []
       ActiveTabColor = clWebDARKGRAY
       InactiveTabColor = clWebLIGHTGRAY
-      ActivePage = 1
+      ActivePage = 0
       Align = alClient
       BorderOptions.NumericWidth = 0
       BorderOptions.Style = cbsNone
@@ -126,17 +126,6 @@ object FrIWBuyer: TFrIWBuyer
       DesignSize = (
         1339
         533)
-      object PAG_00: TIWTabPage
-        Left = 0
-        Top = 20
-        Width = 1339
-        Height = 513
-        RenderInvisibleControls = True
-        Title = '[          Registros          ]'
-        BorderOptions.NumericWidth = 0
-        BorderOptions.Style = cbsNone
-        Color = clWebWHITE
-      end
       object PAG_01: TIWTabPage
         Left = 0
         Top = 20
@@ -474,6 +463,17 @@ object FrIWBuyer: TFrIWBuyer
           DataField = 'AGE'
           FriendlyName = 'EDAD'
         end
+      end
+      object PAG_00: TIWTabPage
+        Left = 0
+        Top = 20
+        Width = 1339
+        Height = 513
+        RenderInvisibleControls = True
+        Title = '[          Registros          ]'
+        BorderOptions.NumericWidth = 0
+        BorderOptions.Style = cbsNone
+        Color = clWebWHITE
       end
     end
   end

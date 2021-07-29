@@ -57,6 +57,7 @@ End;
 constructor TSaveData_Transaction.Create(pCNX : TConexion; Const pData : String);
 Var
   lJ : Integer;
+  lL : Integer;
   lI : TItem_Transaction;
   lK : TItem_Transaction;
   lPos : Integer;
@@ -67,6 +68,7 @@ Var
   lid_product : TStringList;
 begin
   Try
+    lL := 0;
     FCNX := pCNX;
     lLista := TStringList.Create;
     lCampo := TStringList.Create;
@@ -75,6 +77,8 @@ begin
     Desglosar_Texto_Caracter(pData, #0#0, lLista);
     For lAux In lLista Do
     Begin
+      Inc(lL);
+      UtLog_Execute('TSaveData_Transaction.Create, ' + FormatFloat('###,###,###', lL) + ' / ' + FormatFloat('###,###,###', lLista.Count));
       Desglosar_Texto_Caracter(lAux, #0, lCampo);
       lI := TItem_Transaction.Create;
       FItems.Add(lI);
@@ -202,12 +206,22 @@ End;
 
 Procedure TSaveData_Transaction.Save;
 Var
+  lO : String;
+  lK : Integer;
   lI : TItem_Transaction;
 Begin
   Try
+    lO := '';
+    lK := 0;
     For lI In FItems Do
     Begin
-      Insert_M(lI);
+      Inc(lK);
+      UtLog_Execute('TSaveData_Transaction.Save, ' + FormatFloat('###,###,##0', lK) + '/' + FormatFloat('###,###,##0', FItems.Count));
+      If lO <> lI.id Then
+      Begin
+        lO := lI.id;
+        Insert_M(lI);
+      End;
       Insert_D(lI);
     End;
   Except

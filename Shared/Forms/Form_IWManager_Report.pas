@@ -8,7 +8,7 @@ uses
   IWCompGradButton, IWCompEdit, IWCompGrids, IWDBGrids, UtConexion,
   UtTypeTEST_TR, IWBaseComponent, IWBaseHTMLComponent, IWBaseHTML40Component,
   IWCompCheckbox, UtBusqueda_TEST_TR_IWjQDBGrid, IWCompProgressIndicator,
-  IWCompTabControl, IWCompListbox;
+  IWCompTabControl, IWCompListbox, UtMananger_Control;
 type
   TFrIWManager_Report = class(TIWAppForm)
     RREGRESAR: TIWRegion;
@@ -24,16 +24,19 @@ type
     PAG_FECHA: TIWTabPage;
     LbFecha: TIWLabel;
     IWLabel1: TIWLabel;
-    OPCIONES: TIWComboBox;
     FECHA: TIWEdit;
+    OPCIONES: TIWRadioGroup;
+    IWLabel2: TIWLabel;
     procedure IWAppFormCreate(Sender: TObject);
     procedure PRODUCTO_INIAsyncKeyUp(Sender: TObject; EventParams: TStringList);
     procedure PRODUCTO_FINAsyncKeyUp(Sender: TObject; EventParams: TStringList);
     procedure BTNBACKAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNGENERARAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNTERCERO_INIAsyncClick(Sender: TObject; EventParams: TStringList);
-    procedure OPCIONESAsyncClick(Sender: TObject; EventParams: TStringList);
+    procedure IWRadioGroup1AsyncClick(Sender: TObject; EventParams: TStringList);
+    procedure IWAppFormDestroy(Sender: TObject);
   Private
+    FMC : TMananger_Control;
     FCNX : TConexion;
     Function Load_Data_Execute(Var pError : String) : Boolean;
     Function Buyer_Execute : Boolean;
@@ -124,14 +127,17 @@ Var
   lFecha : String;
   lResult : String;
 Begin
+  UtLog_Execute('TFrIWManager_Report.Load_Data_Execute, GET BUYER Request ');
   lFecha := UtRest_Datetime_To_Unix_Timestamp(FECHA.AsDateTime);
   Result := UtRest_Execute('buyers', lFecha, lResult);
+  UtLog_Execute('TFrIWManager_Report.Load_Data_Execute, GET BUYER Response ');
   If Result Then
   Begin
     lSDB := TSaveData_Buyer.Create(UserSession.CNX, lResult);
     FreeAndNil(lSDB);
   End;
 
+  UtLog_Execute('TFrIWManager_Report.Load_Data_Execute, GET PRODUCT ');
   Result := UtRest_Execute('products', lFecha, lResult);
   If Result Then
   Begin
@@ -139,6 +145,7 @@ Begin
     FreeAndNil(lSDP);
   End;
 
+  UtLog_Execute('TFrIWManager_Report.Load_Data_Execute, GET TRANSACTIONS ');
   Result := UtRest_Execute('transactions', lFecha, lResult);
   If Result Then
   Begin
@@ -160,6 +167,12 @@ Function TFrIWManager_Report.History_Execute(Const pBUYER_ID : String) : Boolean
 Var
   lRT : TReporte_Test;
 Begin
+  Result := False;
+  If Vacio(pBUYER_ID) Then
+  Begin
+    UserSession.SetMessage('Debe seleccionar un comprador', True);
+    Exit;
+  End;
   lRT := TReporte_Test.Create(UserSession.CNX, UserSession.CODIGO_USUARIO);
   Result := lRT.Execute_History(pBUYER_ID);
   FreeAndNil(lRT);
@@ -169,6 +182,12 @@ Function TFrIWManager_Report.Other_Buy_Execute(Const pBUYER_ID : String) : Boole
 Var
   lRT : TReporte_Test;
 Begin
+  Result := False;
+  If Vacio(pBUYER_ID) Then
+  Begin
+    UserSession.SetMessage('Debe seleccionar un comprador', True);
+    Exit;
+  End;
   lRT := TReporte_Test.Create(UserSession.CNX, UserSession.CODIGO_USUARIO);
   Result := lRT.Execute_Other_Buy(pBUYER_ID);
   FreeAndNil(lRT);
@@ -191,11 +210,11 @@ Var
   lError2 : String;
 begin
   lOk := False;
-  If OPCIONES.Text = 'CARGA DE DATOS'                   Then lOk := Load_Data_Execute(lError2);
-  If OPCIONES.Text = 'LISTA DE COMPRADORES'             Then lOk := Buyer_Execute;
-  If OPCIONES.Text = 'HISTORIAL DE COMPRAS'             Then lOk := History_Execute(CODIGO_BUYER.Text);
-  If OPCIONES.Text = 'COMPRADORES QUE USAN LA MISMA IP' Then lOk := Other_Buy_Execute(CODIGO_BUYER.Text);
-  If OPCIONES.Text = 'RECOMENDACION DE PRODUCTOS'       Then lOk := Rank_Execute;
+  If OPCIONES.Items[OPCIONES.ItemIndex] = 'CARGA DE DATOS'                   Then lOk := Load_Data_Execute(lError2);
+  If OPCIONES.Items[OPCIONES.ItemIndex] = 'LISTA DE COMPRADORES'             Then lOk := Buyer_Execute;
+  If OPCIONES.Items[OPCIONES.ItemIndex] = 'HISTORIAL DE COMPRAS'             Then lOk := History_Execute(CODIGO_BUYER.Text);
+  If OPCIONES.Items[OPCIONES.ItemIndex] = 'COMPRADORES QUE USAN LA MISMA IP' Then lOk := Other_Buy_Execute(CODIGO_BUYER.Text);
+  If OPCIONES.Items[OPCIONES.ItemIndex] = 'RECOMENDACION DE PRODUCTOS'       Then lOk := Rank_Execute;
 
 //  Case IWOPCIONES.ItemIndex Of
 //    0 : lOk := UtReporte_Execute_Lote_Producto   (WebApplication, FCNX, lENC, lDET, UserSession.CODIGO_USUARIO, lFecha_Ini, lFecha_Fin, lProducto_Ini, lProducto_Fin, lUnidadMedida_Ini, lUnidadMedida_Fin, lLote_Ini, lLote_Fin, CHECK_DOCUMENTOS.Checked, CHECK_MSEXCEL.Checked);
@@ -206,14 +225,14 @@ begin
 //  End;
   If lOk Then
   Begin
-    If OPCIONES.Text <> 'CARGA DE DATOS' Then
+    If OPCIONES.Items[OPCIONES.ItemIndex] <> 'CARGA DE DATOS' Then
     Begin
       If Not Form_Plantilla_Reporte_TEST_TR(WebApplication, lError2) Then
         If Not Vacio(lError) Then
           UserSession.SetMessage(lError, True);
     End
     Else
-      UserSession.SetMessage('Proceso terminado', False);
+      WebApplication.ShowMessage('Proceso terminado');
   End
   Else
   Begin
@@ -240,24 +259,32 @@ procedure TFrIWManager_Report.IWAppFormCreate(Sender: TObject);
 begin
   Caption := 'Administrador de Informes';
   Self.Name := 'REPORTES' + FormatDateTime('YYYYMMDDHHNNSSZZZ', Now) + IntToStr(Random(1000));
+  FMC := TMananger_Control.Create;
   FCNX := UserSession.CNX;
   FECHA.AsDateTime := Now;
   SetLabels;
 end;
 
-procedure TFrIWManager_Report.OPCIONESAsyncClick(Sender: TObject; EventParams: TStringList);
+procedure TFrIWManager_Report.IWAppFormDestroy(Sender: TObject);
 begin
-  PAG_FECHA.Visible := (OPCIONES.Text = 'CARGA DE DATOS');
+  If Assigned(FMC) Then
+    FreeAndNil(FMC);
+end;
 
-  PAG_BUYER.Visible := (OPCIONES.Text = 'HISTORIAL DE COMPRAS'            ) Or
-                       (OPCIONES.Text = 'COMPRADORES QUE USAN LA MISMA IP') Or
-                       (OPCIONES.Text = 'RECOMENDACION DE PRODUCTOS'      ) ;
-  If PAG_FECHA.Visible Then
-    PAGINAS.ActivePage := 0
-  Else
-    PAGINAS.ActivePage := 1;
-  PAGINAS.Visible := PAG_FECHA.Visible Or PAG_BUYER.Visible;
-//UserSession.Refrescar2;
+procedure TFrIWManager_Report.IWRadioGroup1AsyncClick(Sender: TObject;  EventParams: TStringList);
+begin
+//  PAG_FECHA.Visible := (OPCIONES.Items[OPCIONES.ItemIndex] = 'CARGA DE DATOS');
+//
+//  PAG_BUYER.Visible := (OPCIONES.Items[OPCIONES.ItemIndex] = 'HISTORIAL DE COMPRAS'            ) Or
+//                       (OPCIONES.Items[OPCIONES.ItemIndex] = 'COMPRADORES QUE USAN LA MISMA IP') {Or
+//                       (OPCIONES.Text = 'RECOMENDACION DE PRODUCTOS'      )} ;
+//  If PAG_FECHA.Visible Then
+//    PAGINAS.ActivePage := 0
+//  Else
+//    PAGINAS.ActivePage := 1;
+//  PAGINAS.Visible := PAG_FECHA.Visible Or PAG_BUYER.Visible;
+//  FMC.Update_Component(Self);
+//UserSession.Refrescar;
 end;
 
 end.

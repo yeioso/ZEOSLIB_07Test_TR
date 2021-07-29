@@ -7,6 +7,7 @@ object FrIWManager_Report: TFrIWManager_Report
   AllowPageAccess = True
   ConnectionMode = cmAny
   OnCreate = IWAppFormCreate
+  OnDestroy = IWAppFormDestroy
   Background.Fixed = False
   HandleTabs = False
   LeftToRight = True
@@ -17,8 +18,8 @@ object FrIWManager_Report: TFrIWManager_Report
   DesignLeft = 2
   DesignTop = 2
   object BTNGENERAR: TIWImage
-    Left = 432
-    Top = 131
+    Left = 176
+    Top = 299
     Width = 48
     Height = 48
     Cursor = crHandPoint
@@ -174,36 +175,52 @@ object FrIWManager_Report: TFrIWManager_Report
   end
   object IWLabel1: TIWLabel
     Left = 24
-    Top = 72
-    Width = 57
-    Height = 16
+    Top = 65
+    Width = 377
+    Height = 22
+    Alignment = taCenter
     Font.Color = clNone
-    Font.Size = 10
-    Font.Style = []
+    Font.Size = 12
+    Font.Style = [fsBold, fsUnderline]
     NoWrap = True
     HasTabOrder = False
+    AutoSize = False
     FriendlyName = 'IWLabel1'
     Caption = 'Opciones'
   end
-  object OPCIONES: TIWComboBox
-    Left = 87
-    Top = 72
-    Width = 314
-    Height = 21
-    StyleRenderOptions.RenderBorder = False
+  object OPCIONES: TIWRadioGroup
+    Left = 19
+    Top = 94
+    Width = 382
+    Height = 105
+    SubmitOnAsyncEvent = True
+    RawText = False
+    Editable = True
     Font.Color = clNone
     Font.Size = 10
     Font.Style = []
-    OnAsyncClick = OPCIONESAsyncClick
-    ItemIndex = -1
+    FriendlyName = 'OPCIONES'
+    ItemIndex = 0
     Items.Strings = (
       'CARGA DE DATOS'
       'LISTA DE COMPRADORES'
       'HISTORIAL DE COMPRAS'
       'COMPRADORES QUE USAN LA MISMA IP'
       'RECOMENDACION DE PRODUCTOS')
-    FriendlyName = 'OPCIONES'
-    NoSelectionText = '-- No Selection --'
+    Layout = glVertical
+    OnAsyncClick = IWRadioGroup1AsyncClick
+  end
+  object IWLabel2: TIWLabel
+    Left = 176
+    Top = 353
+    Width = 68
+    Height = 16
+    Font.Color = clNone
+    Font.Size = 10
+    Font.Style = [fsBold]
+    HasTabOrder = False
+    FriendlyName = 'IWLabel2'
+    Caption = 'EJECUTAR'
   end
   object RREGRESAR: TIWRegion
     Left = 0
@@ -387,7 +404,7 @@ object FrIWManager_Report: TFrIWManager_Report
   end
   object PAGINAS: TIWTabControl
     Left = 19
-    Top = 99
+    Top = 195
     Width = 382
     Height = 80
     RenderInvisibleControls = True
@@ -422,7 +439,6 @@ object FrIWManager_Report: TFrIWManager_Report
       Top = 30
       Width = 382
       Height = 50
-      Visible = False
       RenderInvisibleControls = True
       TabOrder = 1
       Title = 'BUYER'

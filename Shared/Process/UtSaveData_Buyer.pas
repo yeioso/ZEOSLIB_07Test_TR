@@ -38,18 +38,22 @@ Uses
 { TSaveData_Buyer }
 constructor TSaveData_Buyer.Create(pCNX : TConexion; Const pData : String);
 Var
+  lK : Integer;
   lI : TItem_Buyer;
   JSonValue : TJSONValue;
   JsonArray : TJSONArray;
   ArrayElement: TJSonValue;
 begin
   Try
+    lK := 0;
     FCNX := pCNX;
     FItems := TItems_Buyer.Create;
     JSonValue := TJSONObject.ParseJSONValue(pData);
     JsonArray := JsonValue As TJSONArray;
     For ArrayElement In JsonArray Do
     Begin
+      Inc(lK);
+      UtLog_Execute('TSaveData_Buyer.Create, ' + FormatFloat('###,###,##0', lK) + '/' + FormatFloat('###,###,##0', JsonArray.Count));
       lI := TItem_Buyer.Create;
       FItems.Add(lI);
       lI.id   := StringReplace(ArrayElement.P['id'].ToString, '"', '', [rfReplaceAll]);
@@ -101,11 +105,17 @@ End;
 
 Procedure TSaveData_Buyer.Save;
 Var
+  lK : Integer;
   lI : TItem_Buyer;
 Begin
   Try
+    lK := 0;
     For lI In FItems Do
+    Begin
+      Inc(lK);
+      UtLog_Execute('TSaveData_Buyer.Save, ' + FormatFloat('###,###,##0', lK) + '/' + FormatFloat('###,###,##0', FItems.Count));
       Insert(lI);
+    End;
   Except
     On E: Exception Do
     Begin

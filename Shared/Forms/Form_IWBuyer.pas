@@ -1,7 +1,5 @@
 unit Form_IWBuyer;
-
 interface
-
 uses
   Classes, SysUtils, IWAppForm, IWApplication, IWColor, IWTypes,
   Vcl.Imaging.pngimage, IWVCLBaseControl, IWBaseControl, IWBaseHTMLControl,
@@ -12,7 +10,6 @@ uses
   IWDBStdCtrls, IWCompEdit, IWCompCheckbox, IWCompMemo, IWDBExtCtrls,
   IWCompButton, IWCompListbox, IWCompGradButton, UtTypeTEST_TR, IWCompRadioButton,
   UtGrid_JQ, UtNavegador_ASE;
-
 type
   TFrIWBuyer = class(TIWAppForm)
     RINFO: TIWRegion;
@@ -46,30 +43,22 @@ type
     FQRMAESTRO : TMANAGER_DATA;
     FNAVEGADOR : TNavegador_ASE;
     FGRID_MAESTRO : TGRID_JQ;
-
     FCODIGO_BODEGA : String;
-
     Procedure Release_Me;
-
     Function Existe_Buyer(Const pID : String) : Boolean;
-
     procedure Resultado_ID(EventParams: TStringList);
     procedure Resultado_NAME(EventParams: TStringList);
     procedure Resultado_AGE(EventParams: TStringList);
-
     Procedure Validar_Campos_Master(pSender : TObject);
     Function Documento_Activo : Boolean;
-
     Procedure NewRecordMaster(pSender: TObject);
     Procedure DsDataChangeMaster(pSender: TObject);
     Procedure DsStateMaster(pSender: TObject);
-
     Procedure SetLabel;
     Procedure Estado_Controles;
     Function AbrirMaestro(Const pDato : String = '') : Boolean;
   public
   end;
-
 
 implementation
 {$R *.dfm}
@@ -86,7 +75,6 @@ Uses
   System.UITypes,
   System.StrUtils,
   ServerController;
-
 procedure TFrIWBuyer.Resultado_ID(EventParams: TStringList);
 Begin
   Try
@@ -99,7 +87,6 @@ Begin
       UtLog_Execute('TFrIWBuyer.Resultado_ID, ' + e.Message);
   End;
 End;
-
 procedure TFrIWBuyer.Resultado_NAME(EventParams: TStringList);
 Begin
   Try
@@ -112,7 +99,6 @@ Begin
       UtLog_Execute('TFrIWBuyer.Resultado_NAME, ' + e.Message);
   End;
 End;
-
 procedure TFrIWBuyer.Resultado_AGE(EventParams: TStringList);
 Begin
   Try
@@ -125,17 +111,14 @@ Begin
       UtLog_Execute('TFrIWBuyer.Resultado_NAME, ' + e.Message);
   End;
 End;
-
 Procedure TFrIWBuyer.Release_Me;
 Begin
   Self.Release;
 End;
-
 Function TFrIWBuyer.Existe_Buyer(Const pID : String) : Boolean;
 Begin
   Result := UserSession.CNX.Record_Exist(Retornar_Info_Tabla(Id_Buyer).Name, ['ID'], [pID]);
 End;
-
 Procedure TFrIWBuyer.Validar_Campos_Master(pSender : TObject);
 Var
   lMensaje : String;
@@ -145,28 +128,23 @@ Begin
     lMensaje := '';
     CODIGO.BGColor := UserSession.COLOR_OK;
     NOMBRE.BGColor := UserSession.COLOR_OK;
-
     If FQRMAESTRO.Mode_Edition And (Not Vacio(FQRMAESTRO.QR.FieldByName('NAME').AsString)) Then
       FQRMAESTRO.QR.FieldByName('NAME').AsString := AnsiUpperCase(FQRMAESTRO.QR.FieldByName('NAME').AsString);
-
     If BTNID.Visible And UserSession.CNX.Record_Exist(Retornar_Info_Tabla(Id_Buyer).Name, ['ID'], [FQRMAESTRO.QR.FieldByName('ID').AsString]) Then
     Begin
       lMensaje := lMensaje + IfThen(Not Vacio(lMensaje), ', ') + 'ID exist';
       CODIGO.BGColor := UserSession.COLOR_ERROR;
     End;
-
     If BTNID.Visible And Vacio(FQRMAESTRO.QR.FieldByName('ID').AsString) Then
     Begin
       lMensaje := lMensaje + IfThen(Not Vacio(lMensaje), ', ') + 'ID empty';
       CODIGO.BGColor := UserSession.COLOR_ERROR;
     End;
-
     If BTNNAME.Visible And Vacio(FQRMAESTRO.QR.FieldByName('NAME').AsString) Then
     Begin
       lMensaje := lMensaje + IfThen(Not Vacio(lMensaje), ', ') + 'NAME empty';
       NOMBRE.BGColor := UserSession.COLOR_ERROR;
     End;
-
     FQRMAESTRO.ERROR := IfThen(Vacio(lMensaje), 0, -1);
     If FQRMAESTRO.ERROR <> 0 Then
     Begin
@@ -179,18 +157,15 @@ Begin
   End;
 End;
 
-
 Procedure TFrIWBuyer.Estado_Controles;
 Begin
   BTNID.Visible   := (FQRMAESTRO.DS.State In [dsInsert]) And Documento_Activo;
   BTNNAME.Visible := FQRMAESTRO.Mode_Edition And Documento_Activo;
   BTNAGE.Visible  := FQRMAESTRO.Mode_Edition And Documento_Activo;
-
   DATO.Visible      := (Not FQRMAESTRO.Mode_Edition);
   PAG_00.Visible    := (Not FQRMAESTRO.Mode_Edition);
   PAG_01.Visible    := True;
 End;
-
 Procedure TFrIWBuyer.SetLabel;
 Begin
   If Not FQRMAESTRO.Active Then
@@ -203,7 +178,6 @@ Begin
     End;
   End;
 End;
-
 Function TFrIWBuyer.Documento_Activo : Boolean;
 Begin
   Try
@@ -216,7 +190,6 @@ Begin
     End;
   End;
 End;
-
 procedure TFrIWBuyer.DsDataChangeMaster(pSender: TObject);
 begin
   FNAVEGADOR.UpdateState;
@@ -231,7 +204,6 @@ begin
     End;
   End;
 end;
-
 Procedure TFrIWBuyer.DsStateMaster(pSender: TObject);
 Begin
   Estado_Controles;
@@ -248,7 +220,6 @@ Begin
                End;
   End;
 End;
-
 Function TFrIWBuyer.AbrirMaestro(Const pDato : String = '') : Boolean;
 Begin
   FGRID_MAESTRO.Caption := Retornar_Info_Tabla(Id_Buyer).Caption;
@@ -267,7 +238,6 @@ Begin
     Result := FQRMAESTRO.Active;
     If Result Then
     Begin
-
     End;
   Except
     On E: Exception Do
@@ -277,7 +247,6 @@ Begin
   End;
   FGRID_MAESTRO.RefreshData;
 End;
-
 procedure TFrIWBuyer.IWAppFormCreate(Sender: TObject);
 Var
   lI : Integer;
@@ -296,24 +265,19 @@ begin
     FGRID_MAESTRO.Left   := 010;
     FGRID_MAESTRO.Width  := 700;
     FGRID_MAESTRO.Height := 500;
-
     FQRMAESTRO := UserSession.Create_Manager_Data(Retornar_Info_Tabla(Id_Buyer).Name, Retornar_Info_Tabla(Id_Buyer).Caption);
-
     FQRMAESTRO.ON_NEW_RECORD   := NewRecordMaster;
     FQRMAESTRO.ON_BEFORE_POST  := Validar_Campos_Master;
     FQRMAESTRO.ON_DATA_CHANGE  := DsDataChangeMaster;
     FQRMAESTRO.ON_STATE_CHANGE := DsStateMaster;
-
     CODIGO.DataSource := FQRMAESTRO.DS;
     NOMBRE.DataSource := FQRMAESTRO.DS;
     EDAD.DataSource   := FQRMAESTRO.DS;
-
     FGRID_MAESTRO.SetGrid(FQRMAESTRO.DS, ['ID'           , 'NAME'       ],
                                          ['ID'           , 'NAME'       ],
                                          ['S'            , 'N'          ],
                                          [100            , 550          ],
                                          [taRightJustify , taLeftJustify]);
-
 
     FNAVEGADOR               := TNavegador_ASE.Create(IWRegion_Navegador);
     FNAVEGADOR.Parent        := IWRegion_Navegador;
@@ -325,7 +289,6 @@ begin
     FNAVEGADOR.Left := 1;
     IWRegion_Navegador.Width  := FNAVEGADOR.Width  + 1;
     IWRegion_Navegador.Height := FNAVEGADOR.Height + 1;
-
     If AbrirMaestro Then
     Begin
     End
@@ -338,7 +301,6 @@ begin
     End;
   End;
 end;
-
 procedure TFrIWBuyer.IWAppFormDestroy(Sender: TObject);
 begin
     Try
@@ -347,23 +309,19 @@ begin
         FQRMAESTRO.Active := False;
         FreeAndNil(FQRMAESTRO);
       End;
-
       If Assigned(FNAVEGADOR) Then
       Begin
         FreeAndNil(FNAVEGADOR);
       End;
-
       If Assigned(FGRID_MAESTRO) Then
       Begin
         FreeAndNil(FGRID_MAESTRO);
       End;
-
     Except
       On E: Exception Do
         UtLog_Execute('TFrIWBuyer.IWAppFormDestroy, ' + e.Message);
     End;
 end;
-
 procedure TFrIWBuyer.NewRecordMaster(pSender: TObject);
 begin
   Try
@@ -374,7 +332,6 @@ begin
     End;
   End;
 end;
-
 procedure TFrIWBuyer.BTNAGEAsyncClick(Sender: TObject; EventParams: TStringList);
 begin
   Try
@@ -392,12 +349,10 @@ Procedure TFrIWBuyer.BTNBACKAsyncClick(Sender: TObject; EventParams: TStringList
 begin
   Release_Me;
 end;
-
 procedure TFrIWBuyer.BTNBUSCARAsyncClick(Sender: TObject;  EventParams: TStringList);
 begin
   AbrirMaestro(DATO.Text);
 end;
-
 procedure TFrIWBuyer.BTNIDAsyncClick(Sender: TObject; EventParams: TStringList);
 begin
   Try
@@ -410,7 +365,6 @@ begin
       UtLog_Execute('TFrIWBuyer.BTNCODIGOAsyncClick, ' + e.Message);
   End;
 end;
-
 procedure TFrIWBuyer.BTNNAMEAsyncClick(Sender: TObject; EventParams: TStringList);
 begin
   Try
@@ -423,5 +377,4 @@ begin
       UtLog_Execute('TFrIWBuyer.BTNNOMBREAsyncClick, ' + e.Message);
   End;
 end;
-
 end.

@@ -7,6 +7,7 @@ Function UtRest_Execute(Const pFunction, pDate : String; Var pOut : String) : Bo
 
 implementation
 Uses
+  UtLog,
   REST.Types,
   REST.Client,
   System.SysUtils,
@@ -41,6 +42,7 @@ Begin
     On E: Exception Do
     Begin
       pOut := E.Message;
+      UtLog_Execute('UtRest_Execute, ' + lClient.BaseURL + ', ' + E.Message);
     End;
   End;
 End;
